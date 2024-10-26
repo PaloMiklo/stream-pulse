@@ -1,7 +1,9 @@
 package com.palomiklo.streampulse;
 
+import com.palomiklo.streampulse.config.ConfigLoader;
+
 public class App {
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        var config = new ConfigLoader();
     }
 }
