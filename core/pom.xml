@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
-
-xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
 
@@ -19,6 +18,7 @@ xmlns="http://maven.apache.org/POM/4.0.0"
   <name>core</name>
   <url>http://maven.apache.org</url>
 
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -35,11 +35,47 @@ xmlns="http://maven.apache.org/POM/4.0.0"
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
     </dependency>
-
     <dependency>
       <groupId>org.yaml</groupId>
       <artifactId>snakeyaml</artifactId>
+      <version>${org.yaml}</version>
     </dependency>
 
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <version>${jakarta.servlet}</version>
+      <scope>provided</scope>
+  </dependency>
   </dependencies>
+
+  <profiles>
+    <profile>
+        <id>local-install</id>
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>2.5.2</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>install-file</goal>
+                            </goals>
+                            <phase>install</phase>
+                            <configuration>
+                                <file>${project.build.directory}/${project.artifactId}-${project.version}.jar</file>
+                                <groupId>${project.groupId}</groupId>
+                                <artifactId>${project.artifactId}</artifactId>
+                                <version>${project.version}</version>
+                                <packaging>jar</packaging>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </build>
+    </profile>
+</profiles>
 </project>

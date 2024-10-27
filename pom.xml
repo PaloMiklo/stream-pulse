@@ -20,6 +20,7 @@
     <ch.qos.logback>1.5.6</ch.qos.logback>
     <org.yaml>2.3</org.yaml>
     <junit>3.8.1</junit>
+    <jakarta.servlet>5.0.0</jakarta.servlet>
   </properties>
 
   <dependencyManagement>
@@ -36,19 +37,14 @@
         <version>${ch.qos.logback}</version>
       </dependency>
 
-      
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>${junit}</version>
-      <scope>test</scope>
-    </dependency>
 
       <dependency>
-        <groupId>org.yaml</groupId>
-        <artifactId>snakeyaml</artifactId>
-        <version>${org.yaml}</version>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junit}</version>
+        <scope>test</scope>
       </dependency>
+
     </dependencies>
   </dependencyManagement>
 
