@@ -13,16 +13,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.palomiklo.streampulse.blueprint.IStreamPulseConnectionConfig;
+import static com.palomiklo.streampulse.connection.StreamPulseThreadFactory.streamPulseThreadFactory;
 
 import jakarta.servlet.http.HttpServletResponse;
 
 public class StreamPulseConnection {
     private final Logger logger = LoggerFactory.getLogger(StreamPulseConnection.class);
     private final AtomicBoolean connected = new AtomicBoolean(true);
-    private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+    private final ScheduledExecutorService executor = Executors
+            .newSingleThreadScheduledExecutor(streamPulseThreadFactory);
     private final Lock writeLock = new ReentrantLock();
-    private final IStreamPulseConnectionConfig config;
     private PrintWriter writer;
+    private final IStreamPulseConnectionConfig config;
     private final HttpServletResponse response;
 
     private StreamPulseConnection(IStreamPulseConnectionConfig configuration, HttpServletResponse response) {
@@ -87,7 +89,7 @@ public class StreamPulseConnection {
         }
     }
 
-    private ScheduledExecutorService startHeartbeat() {
+    private void startHeartbeat() {
         logger.debug("Starting heartbeat...");
 
         executor.scheduleAtFixedRate(() -> {
@@ -108,8 +110,6 @@ public class StreamPulseConnection {
             logger.debug("%s minutes has passed. Stopping heartbeat...", config.getConnectionTimeout() / 60);
             closeConnection();
         }, config.getConnectionTimeout(), SECONDS);
-
-        return executor;
     }
 
     private void closeConnection() {
