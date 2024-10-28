@@ -46,36 +46,42 @@
       <artifactId>jakarta.servlet-api</artifactId>
       <version>${jakarta.servlet}</version>
       <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>jakarta.annotation</groupId>
+      <artifactId>jakarta.annotation-api</artifactId>
+      <version>${jakarta.annotations}</version>
   </dependency>
   </dependencies>
 
   <profiles>
     <profile>
-        <id>local-install</id>
-        <build>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-install-plugin</artifactId>
-                    <version>2.5.2</version>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>install-file</goal>
-                            </goals>
-                            <phase>install</phase>
-                            <configuration>
-                                <file>${project.build.directory}/${project.artifactId}-${project.version}.jar</file>
-                                <groupId>${project.groupId}</groupId>
-                                <artifactId>${project.artifactId}</artifactId>
-                                <version>${project.version}</version>
-                                <packaging>jar</packaging>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-            </plugins>
-        </build>
+      <id>local-install</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-install-plugin</artifactId>
+            <version>${maven.compiler.plugin-install}</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>install-file</goal>
+                </goals>
+                <phase>install</phase>
+                <configuration>
+                  <file>${project.build.directory}/${project.artifactId}-${project.version}.jar</file>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>${project.artifactId}</artifactId>
+                  <version>${project.version}</version>
+                  <packaging>jar</packaging>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
-</profiles>
+  </profiles>
 </project>

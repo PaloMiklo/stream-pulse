@@ -17,10 +17,12 @@
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
     <maven.compiler.plugin>2.3</maven.compiler.plugin>
+    <maven.compiler.plugin-install>2.5.2</maven.compiler.plugin-install>
     <ch.qos.logback>1.5.6</ch.qos.logback>
     <org.yaml>2.3</org.yaml>
     <junit>3.8.1</junit>
     <jakarta.servlet>5.0.0</jakarta.servlet>
+    <jakarta.annotations>2.1.1</jakarta.annotations>
   </properties>
 
   <dependencyManagement>
@@ -36,7 +38,6 @@
         <artifactId>logback-classic</artifactId>
         <version>${ch.qos.logback}</version>
       </dependency>
-
 
       <dependency>
         <groupId>junit</groupId>
@@ -57,6 +58,7 @@
         <configuration>
           <source>${maven.compiler.source}</source>
           <target>${maven.compiler.target}</target>
+          <compilerArgs>--enable-preview</compilerArgs>
         </configuration>
       </plugin>
     </plugins>

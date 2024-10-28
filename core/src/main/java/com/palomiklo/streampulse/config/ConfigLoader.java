@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
+import jakarta.annotation.Nonnull;
+
 public class ConfigLoader {
     private static ConfigLoader instance;
     private final Properties properties = new Properties();
@@ -17,6 +19,7 @@ public class ConfigLoader {
         loadUserProperties();
     }
 
+    @Nonnull
     public static final ConfigLoader initialize() {
         if (instance == null) {
             instance = new ConfigLoader();

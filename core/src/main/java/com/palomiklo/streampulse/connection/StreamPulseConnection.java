@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import com.palomiklo.streampulse.blueprint.IStreamPulseConnectionConfig;
 import static com.palomiklo.streampulse.connection.StreamPulseThreadFactory.streamPulseThreadFactory;
+import static com.palomiklo.streampulse.util.Wrap.wrap;
 
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -23,28 +24,20 @@ public class StreamPulseConnection {
     private final ScheduledExecutorService executor = Executors
             .newSingleThreadScheduledExecutor(streamPulseThreadFactory);
     private final Lock writeLock = new ReentrantLock();
-    private PrintWriter writer;
     private final IStreamPulseConnectionConfig config;
     private final HttpServletResponse response;
+    private PrintWriter writer;
 
     private StreamPulseConnection(IStreamPulseConnectionConfig configuration, HttpServletResponse response) {
         this.config = configuration;
         this.response = response;
-        try {
-            initializeConnection();
-        } catch (IOException e) {
-            logger.error("Failed to initialize connection: ", e);
-        }
+        wrap(() -> initializeConnection(), "Failed to initialize connection: ");
     }
 
     private StreamPulseConnection(HttpServletResponse response) {
         this.config = new DefaultStreamPulseConnectionConfig();
         this.response = response;
-        try {
-            initializeConnection();
-        } catch (IOException e) {
-            logger.error("Failed to initialize connection: ", e);
-        }
+        wrap(() -> initializeConnection(), "Failed to initialize connection: ");
     }
 
     public static StreamPulseConnection createConnection(HttpServletResponse response) {
@@ -71,7 +64,7 @@ public class StreamPulseConnection {
         }
     }
 
-    private void sendEvent(String event) throws IOException {
+    private void sendEvent(String event) {
         writeLock.lock();
         try {
             if (isConnected() && writer != null) {
@@ -92,31 +85,29 @@ public class StreamPulseConnection {
     private void startHeartbeat() {
         logger.debug("Starting heartbeat...");
 
-        executor.scheduleAtFixedRate(() -> {
-            try {
-                if (isConnected()) {
-                    logger.debug("Sending heartbeat...");
-                    sendEvent("ping");
-                } else {
-                    closeConnection();
-                }
-            } catch (IOException e) {
-                logger.error("Error during heartbeat: ", e);
-                closeConnection();
-            }
-        }, config.getInitialDelay(), config.getPingInterval(), SECONDS);
+        executor.scheduleAtFixedRate(
+                () -> wrap(() -> hearthbeat(), "Error during heartbeat: ", () -> closeConnection()),
+                config.getInitialDelay(), config.getPingInterval(), SECONDS);
 
-        executor.schedule(() -> {
-            logger.debug("%s minutes has passed. Stopping heartbeat...", config.getConnectionTimeout() / 60);
+        executor.schedule(() -> stopHearthbeat(), config.getConnectionTimeout(), SECONDS);
+    }
+
+    private void hearthbeat() {
+        if (isConnected())
+            sendEvent("ping");
+        else
             closeConnection();
-        }, config.getConnectionTimeout(), SECONDS);
+    }
+
+    private void stopHearthbeat() {
+        logger.debug("%s minutes has passed. Stopping heartbeat...", config.getConnectionTimeout() / 60);
+        closeConnection();
     }
 
     private void closeConnection() {
         connected.set(false);
-        if (writer != null) {
+        if (writer != null)
             writer.close();
-        }
         executor.shutdown();
         logger.debug("Connection closed!");
     }
