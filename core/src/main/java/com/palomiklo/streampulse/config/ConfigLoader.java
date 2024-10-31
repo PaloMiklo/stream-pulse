@@ -3,6 +3,7 @@ package com.palomiklo.streampulse.config;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,32 +12,42 @@ import org.yaml.snakeyaml.Yaml;
 import jakarta.annotation.Nonnull;
 
 public class ConfigLoader {
-    private static ConfigLoader instance;
+    private static volatile ConfigLoader instance;
     private final Properties properties = new Properties();
+    private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
     private final Logger logger = LoggerFactory.getLogger(ConfigLoader.class);
+    private Map<String, String> config;
 
     private ConfigLoader() {
         loadUserProperties();
     }
 
     @Nonnull
-    public static final ConfigLoader initialize() {
+    public static ConfigLoader initialize() {
         if (instance == null) {
-            instance = new ConfigLoader();
+            synchronized (ConfigLoader.class) {
+                if (instance == null) {
+                    instance = new ConfigLoader();
+                }
+            }
         }
         return instance;
     }
 
     private void loadUserProperties() {
-        logger.debug("Loading properties...");
-        final String userPropertiesPath = "application.yml";
-        final Yaml yaml = new Yaml();
+        rwLock.writeLock().lock();
+        try {
+            logger.debug("Loading properties...");
+            final String userPropertiesPath = "application.yml";
+            final Yaml yaml = new Yaml();
 
-        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(userPropertiesPath);
-        Map<String, String> config = yaml.load(inputStream);
-
-        config.forEach((key, value) -> properties.setProperty(key, value));
-        logger.debug(getJdbcUrl());
+            InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(userPropertiesPath);
+            config = yaml.load(inputStream);
+            config.forEach(properties::setProperty);
+            logger.debug(getJdbcUrl());
+        } finally {
+            rwLock.writeLock().unlock();
+        }
     }
 
     public final String getJdbcUrl() {

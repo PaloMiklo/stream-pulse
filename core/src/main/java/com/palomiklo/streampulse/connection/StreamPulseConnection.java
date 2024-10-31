@@ -50,18 +50,10 @@ public class StreamPulseConnection {
     }
 
     private void initializeConnection() throws IOException {
-        response.setContentType("text/event-stream");
-        response.setCharacterEncoding("UTF-8");
-        response.setHeader("Cache-Control", "no-cache");
-        response.setHeader("Connection", "keep-alive");
-        response.setHeader("Transfer-Encoding", "chunked");
-
         this.writer = response.getWriter();
         logger.debug("Connection established!");
 
         startHeartbeat();
-        while (isConnected()) {
-        }
     }
 
     private void sendEvent(String event) {
