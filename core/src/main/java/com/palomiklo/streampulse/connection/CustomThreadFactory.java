@@ -4,8 +4,7 @@ import java.util.concurrent.ThreadFactory;
 
 import jakarta.annotation.Nullable;
 
-public class StreamPulseThreadFactory {
-
+public class CustomThreadFactory {
     @Nullable
     public static final ThreadFactory streamPulseThreadFactory = new ThreadFactory() {
         private final String namePattern = "stream-pulse-thread-%d";

@@ -1,6 +1,6 @@
 package com.palomiklo.streampulse.blueprint;
 
-public interface IStreamPulseConnectionConfig {
+public interface IConnectionConfig {
     byte getConnectionTimeout();
     byte getInitialDelay();
     byte getPingInterval();

@@ -1,12 +1,12 @@
 package com.palomiklo.streampulse.connection;
 
-import com.palomiklo.streampulse.blueprint.IStreamPulseConnectionConfig;
+import com.palomiklo.streampulse.blueprint.IConnectionConfig;
 import static com.palomiklo.streampulse.constant.Default.CONNECTION_CLEAN_UP_TIMEOUT;
 import static com.palomiklo.streampulse.constant.Default.CONNECTION_TIMEOUT;
 import static com.palomiklo.streampulse.constant.Default.INITIAL_DELAY;
 import static com.palomiklo.streampulse.constant.Default.PING_INTERVAL;
 
-public class DefaultStreamPulseConnectionConfig implements IStreamPulseConnectionConfig {
+public class DefaultConnectionConfig implements IConnectionConfig {
 
     @Override
     public byte getConnectionTimeout() {
