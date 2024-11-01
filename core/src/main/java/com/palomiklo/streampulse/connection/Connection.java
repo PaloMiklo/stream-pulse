@@ -13,6 +13,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.palomiklo.streampulse.blueprint.IConnection;
 import com.palomiklo.streampulse.blueprint.IConnectionConfig;
 import static com.palomiklo.streampulse.context.AsynchronousContext.startAsyncContext;
 import static com.palomiklo.streampulse.header.Header.setHeaders;
@@ -22,7 +23,7 @@ import static com.palomiklo.streampulse.util.Wrap.wrap;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-public class Connection {
+public class Connection implements IConnection {
 
     private final Logger log = LoggerFactory.getLogger(Connection.class);
     private final AtomicBoolean connected = new AtomicBoolean(true);
@@ -49,7 +50,7 @@ public class Connection {
     }
 
     private Connection(HttpServletRequest req, HttpServletResponse res) {
-        this.conf = new DefaultConnection();
+        this.conf = new DefaultConnectionConfig();
         this.req = req;
         this.res = res;
         wrap(() -> initializeConnection(), "Failed to initialize connection: ");
@@ -65,6 +66,7 @@ public class Connection {
         startHeartbeat();
     }
 
+    @Override
     public void sendEvent(String event) {
         writeLock.lock();
         try {

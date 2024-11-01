@@ -6,7 +6,7 @@ import static com.palomiklo.streampulse.constant.Default.CONNECTION_TIMEOUT;
 import static com.palomiklo.streampulse.constant.Default.INITIAL_DELAY;
 import static com.palomiklo.streampulse.constant.Default.PING_INTERVAL;
 
-public class DefaultConnection implements IConnectionConfig {
+public class DefaultConnectionConfig implements IConnectionConfig {
 
     @Override
     public byte getConnectionTimeout() {
