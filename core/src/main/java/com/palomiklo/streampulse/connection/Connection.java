@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.palomiklo.streampulse.blueprint.IConnectionConfig;
-import com.palomiklo.streampulse.config.DefaultConnection;
+
 import static com.palomiklo.streampulse.context.AsynchronousContext.startAsyncContext;
 import static com.palomiklo.streampulse.header.Header.setHeaders;
 import static com.palomiklo.streampulse.thread.CustomThreadFactory.streamPulseThreadFactory;

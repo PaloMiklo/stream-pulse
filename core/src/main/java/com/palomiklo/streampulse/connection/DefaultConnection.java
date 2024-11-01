@@ -1,4 +1,4 @@
-package com.palomiklo.streampulse.config;
+package com.palomiklo.streampulse.connection;
 
 import com.palomiklo.streampulse.blueprint.IConnectionConfig;
 import static com.palomiklo.streampulse.constant.Default.CONNECTION_CLEAN_UP_TIMEOUT;
