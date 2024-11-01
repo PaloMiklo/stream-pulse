@@ -15,8 +15,8 @@ public class ConfigLoader {
     private static volatile ConfigLoader instance;
     private final Properties properties = new Properties();
     private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
-    private final Logger logger = LoggerFactory.getLogger(ConfigLoader.class);
-    private Map<String, String> config;
+    private final Logger log = LoggerFactory.getLogger(ConfigLoader.class);
+    private Map<String, String> conf;
 
     private ConfigLoader() {
         loadUserProperties();
@@ -37,14 +37,14 @@ public class ConfigLoader {
     private void loadUserProperties() {
         rwLock.writeLock().lock();
         try {
-            logger.debug("Loading properties...");
+            log.debug("Loading properties...");
             final String userPropertiesPath = "application.yml";
             final Yaml yaml = new Yaml();
 
             InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(userPropertiesPath);
-            config = yaml.load(inputStream);
-            config.forEach(properties::setProperty);
-            logger.debug(getJdbcUrl());
+            conf = yaml.load(inputStream);
+            conf.forEach(properties::setProperty);
+            log.debug(getJdbcUrl());
         } finally {
             rwLock.writeLock().unlock();
         }

@@ -2,7 +2,8 @@ package com.palomiklo.streampulse.connection;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.concurrent.Executors;
+import static java.util.UUID.randomUUID;
+import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import java.util.concurrent.ScheduledExecutorService;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -13,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.palomiklo.streampulse.blueprint.IConnectionConfig;
-
 import static com.palomiklo.streampulse.context.AsynchronousContext.startAsyncContext;
 import static com.palomiklo.streampulse.header.Header.setHeaders;
 import static com.palomiklo.streampulse.thread.CustomThreadFactory.streamPulseThreadFactory;
@@ -23,45 +23,44 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 public class Connection {
-    private final Logger logger = LoggerFactory.getLogger(Connection.class);
+
+    private final Logger log = LoggerFactory.getLogger(Connection.class);
     private final AtomicBoolean connected = new AtomicBoolean(true);
     private final Lock writeLock = new ReentrantLock();
-    private final IConnectionConfig config;
-    private final HttpServletRequest request;
-    private final HttpServletResponse response;
-    private final ScheduledExecutorService executor = Executors
-            .newSingleThreadScheduledExecutor(streamPulseThreadFactory);
+    private final IConnectionConfig conf;
+    private final HttpServletRequest req;
+    private final HttpServletResponse res;
+    private final ScheduledExecutorService exec = newSingleThreadScheduledExecutor(streamPulseThreadFactory);
     private PrintWriter writer;
 
-    public static Connection createConnection(HttpServletRequest request, HttpServletResponse response) {
-        return new Connection(request, response);
+    public static ConnectionInfo createConnection(HttpServletRequest req, HttpServletResponse res) {
+        return new ConnectionInfo(randomUUID(), new Connection(req, res));
     }
 
-    public static Connection createConnection(IConnectionConfig conf, HttpServletRequest request,
-            HttpServletResponse response) {
-        return new Connection(conf, request, response);
+    public static ConnectionInfo createConnection(IConnectionConfig conf, HttpServletRequest req, HttpServletResponse res) {
+        return new ConnectionInfo(randomUUID(), new Connection(conf, req, res));
     }
 
-    private Connection(IConnectionConfig conf, HttpServletRequest request, HttpServletResponse response) {
-        this.config = conf;
-        this.response = response;
-        this.request = request;
+    private Connection(IConnectionConfig conf, HttpServletRequest req, HttpServletResponse res) {
+        this.conf = conf;
+        this.res = res;
+        this.req = req;
         wrap(() -> initializeConnection(), "Failed to initialize connection: ");
     }
 
-    private Connection(HttpServletRequest request, HttpServletResponse response) {
-        this.config = new DefaultConnection();
-        this.request = request;
-        this.response = response;
+    private Connection(HttpServletRequest req, HttpServletResponse res) {
+        this.conf = new DefaultConnection();
+        this.req = req;
+        this.res = res;
         wrap(() -> initializeConnection(), "Failed to initialize connection: ");
     }
 
     private void initializeConnection() throws IOException {
-        startAsyncContext(request, response);
-        setHeaders(response);
+        startAsyncContext(req, res);
+        setHeaders(res);
 
-        this.writer = response.getWriter();
-        logger.debug("Connection established!");
+        this.writer = res.getWriter();
+        log.debug("Connection established!");
 
         startHeartbeat();
     }
@@ -72,10 +71,10 @@ public class Connection {
             if (isConnected() && writer != null) {
                 writer.write("data: " + event + "\n\n");
                 writer.flush();
-                logger.debug("Event sent: {}", event);
+                log.debug("Event sent: {}", event);
 
                 if (writer.checkError()) {
-                    logger.debug("Connection error detected!");
+                    log.debug("Connection error detected!");
                     closeConnection();
                 }
             }
@@ -85,33 +84,36 @@ public class Connection {
     }
 
     private void startHeartbeat() {
-        logger.debug("Starting heartbeat...");
+        log.debug("Starting heartbeat...");
 
-        executor.scheduleAtFixedRate(
+        exec.scheduleAtFixedRate(
                 () -> wrap(() -> hearthbeat(), "Error during heartbeat: ", () -> closeConnection()),
-                config.getInitialDelay(), config.getPingInterval(), SECONDS);
+                conf.getInitialDelay(), conf.getPingInterval(), SECONDS
+        );
 
-        executor.schedule(() -> stopHearthbeat(), config.getConnectionTimeout(), SECONDS);
+        exec.schedule(() -> stopHearthbeat(), conf.getConnectionTimeout(), SECONDS);
     }
 
     private void hearthbeat() {
-        if (isConnected())
+        if (isConnected()) {
             sendEvent("ping");
-        else
+        } else {
             closeConnection();
+        }
     }
 
     private void stopHearthbeat() {
-        logger.debug("%s minutes has passed. Stopping heartbeat...", config.getConnectionTimeout() / 60);
+        log.debug("%s minutes has passed. Stopping heartbeat...", conf.getConnectionTimeout() / 60);
         closeConnection();
     }
 
     private void closeConnection() {
         connected.set(false);
-        if (writer != null)
+        if (writer != null) {
             writer.close();
-        executor.shutdown();
-        logger.debug("Connection closed!");
+        }
+        exec.shutdown();
+        log.debug("Connection closed!");
     }
 
     private boolean isConnected() {

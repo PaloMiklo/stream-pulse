@@ -6,13 +6,14 @@ import org.slf4j.LoggerFactory;
 import com.palomiklo.streampulse.connection.Connection;
 
 public class Wrap {
-    private static final Logger logger = LoggerFactory.getLogger(Connection.class);
+
+    private static final Logger log = LoggerFactory.getLogger(Connection.class);
 
     public static void wrap(CheckedRunnable runnable, String message) {
         try {
             runnable.run();
         } catch (Exception e) {
-            logger.error(message, e);
+            log.error(message, e);
         }
     }
 
@@ -20,7 +21,7 @@ public class Wrap {
         try {
             runnable.run();
         } catch (Exception e) {
-            logger.error(message, e);
+            log.error(message, e);
         }
     }
 
