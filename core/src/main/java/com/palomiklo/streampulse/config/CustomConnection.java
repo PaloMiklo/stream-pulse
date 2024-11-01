@@ -1,4 +1,4 @@
-package com.palomiklo.streampulse.connection;
+package com.palomiklo.streampulse.config;
 
 import com.palomiklo.streampulse.blueprint.IConnectionConfig;
 import static com.palomiklo.streampulse.constant.Default.CONNECTION_CLEAN_UP_TIMEOUT;
@@ -6,13 +6,13 @@ import static com.palomiklo.streampulse.constant.Default.CONNECTION_TIMEOUT;
 import static com.palomiklo.streampulse.constant.Default.INITIAL_DELAY;
 import static com.palomiklo.streampulse.constant.Default.PING_INTERVAL;
 
-public class CustomConnectionConfig implements IConnectionConfig {
+public class CustomConnection implements IConnectionConfig {
     private final byte connectionTimeout;
     private final byte initialDelay;
     private final byte pingInterval;
     private final short connectionCleanUpTimeout;
 
-    private CustomConnectionConfig(Builder builder) {
+    private CustomConnection(Builder builder) {
         this.connectionTimeout = builder.connectionTimeout;
         this.initialDelay = builder.initialDelay;
         this.pingInterval = builder.pingInterval;
@@ -65,8 +65,8 @@ public class CustomConnectionConfig implements IConnectionConfig {
             return this;
         }
 
-        public CustomConnectionConfig build() {
-            return new CustomConnectionConfig(this);
+        public CustomConnection build() {
+            return new CustomConnection(this);
         }
     }
 }

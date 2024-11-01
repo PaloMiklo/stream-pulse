@@ -13,9 +13,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.palomiklo.streampulse.blueprint.IConnectionConfig;
-import static com.palomiklo.streampulse.connection.AsynchronousContext.startAsyncContext;
-import static com.palomiklo.streampulse.connection.CustomThreadFactory.streamPulseThreadFactory;
-import static com.palomiklo.streampulse.connection.Header.setHeaders;
+import com.palomiklo.streampulse.config.DefaultConnection;
+import static com.palomiklo.streampulse.context.AsynchronousContext.startAsyncContext;
+import static com.palomiklo.streampulse.header.Header.setHeaders;
+import static com.palomiklo.streampulse.thread.CustomThreadFactory.streamPulseThreadFactory;
 import static com.palomiklo.streampulse.util.Wrap.wrap;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,11 +25,12 @@ import jakarta.servlet.http.HttpServletResponse;
 public class Connection {
     private final Logger logger = LoggerFactory.getLogger(Connection.class);
     private final AtomicBoolean connected = new AtomicBoolean(true);
-    private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(streamPulseThreadFactory);
     private final Lock writeLock = new ReentrantLock();
     private final IConnectionConfig config;
-    private final HttpServletResponse response;
     private final HttpServletRequest request;
+    private final HttpServletResponse response;
+    private final ScheduledExecutorService executor = Executors
+            .newSingleThreadScheduledExecutor(streamPulseThreadFactory);
     private PrintWriter writer;
 
     public static Connection createConnection(HttpServletRequest request, HttpServletResponse response) {
@@ -40,8 +42,7 @@ public class Connection {
         return new Connection(conf, request, response);
     }
 
-    private Connection(IConnectionConfig conf, HttpServletRequest request,
-            HttpServletResponse response) {
+    private Connection(IConnectionConfig conf, HttpServletRequest request, HttpServletResponse response) {
         this.config = conf;
         this.response = response;
         this.request = request;
@@ -49,7 +50,7 @@ public class Connection {
     }
 
     private Connection(HttpServletRequest request, HttpServletResponse response) {
-        this.config = new DefaultConnectionConfig();
+        this.config = new DefaultConnection();
         this.request = request;
         this.response = response;
         wrap(() -> initializeConnection(), "Failed to initialize connection: ");

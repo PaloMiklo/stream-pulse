@@ -1,4 +1,4 @@
-package com.palomiklo.streampulse.connection;
+package com.palomiklo.streampulse.thread;
 
 import java.util.concurrent.ThreadFactory;
 

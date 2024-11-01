@@ -1,4 +1,4 @@
-package com.palomiklo.streampulse.connection;
+package com.palomiklo.streampulse.context;
 
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.http.HttpServletRequest;

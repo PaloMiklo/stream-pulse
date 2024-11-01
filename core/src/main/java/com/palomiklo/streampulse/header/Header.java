@@ -1,4 +1,4 @@
-package com.palomiklo.streampulse.connection;
+package com.palomiklo.streampulse.header;
 
 import jakarta.servlet.http.HttpServletResponse;
 
