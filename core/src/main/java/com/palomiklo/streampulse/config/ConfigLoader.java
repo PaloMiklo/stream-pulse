@@ -12,6 +12,7 @@ import org.yaml.snakeyaml.Yaml;
 import jakarta.annotation.Nonnull;
 
 public class ConfigLoader {
+
     private static volatile ConfigLoader instance;
     private final Properties properties = new Properties();
     private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
@@ -19,6 +20,7 @@ public class ConfigLoader {
     private Map<String, String> conf;
 
     private ConfigLoader() {
+        log.debug("Config loader is initializing configuration...");
         loadUserProperties();
     }
 
