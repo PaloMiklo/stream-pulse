@@ -103,6 +103,7 @@ public class Connection implements IConnection {
         }
     }
 
+    @Override
     public void closeConnection() {
         writeLock.lock();
         try {
@@ -121,6 +122,7 @@ public class Connection implements IConnection {
         }
     }
 
+    @Override
     public boolean isConnected() {
         return connected.get();
     }

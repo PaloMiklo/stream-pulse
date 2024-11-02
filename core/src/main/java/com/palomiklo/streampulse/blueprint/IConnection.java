@@ -2,5 +2,9 @@ package com.palomiklo.streampulse.blueprint;
 
 public interface IConnection {
 
-    public void sendEvent(String event);
+    void sendEvent(String event);
+
+    void closeConnection();
+
+    boolean isConnected();
 }
