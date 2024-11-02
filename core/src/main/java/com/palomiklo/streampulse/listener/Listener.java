@@ -13,31 +13,36 @@ public class Listener {
 
     private static final Logger log = LoggerFactory.getLogger(Listener.class);
 
-    public static void addListeners(AsyncContext actx, ConnectionHolder streamPulse) {
+    public static void addListeners(AsyncContext actx, ConnectionHolder chldr) {
         actx.addListener(new AsyncListener() {
             @Override
             public void onComplete(AsyncEvent event) {
-                log.debug("Async process completed for connection ID: {}", streamPulse.id());
-                if (streamPulse.connection().isConnected()) {
-                    streamPulse.connection().closeConnection();
+                log.debug("Async process completed for connection ID: {}", chldr.id());
+                if (chldr.connection().isConnected()) {
+                    chldr.connection().closeConnection();
                 }
             }
 
             @Override
             public void onTimeout(AsyncEvent event) {
-                log.debug("Async process timed out for connection ID: {}", streamPulse.id());
-                streamPulse.connection().closeConnection();
+                log.debug("Async process timed out for connection ID: {}", chldr.id());
+                if (chldr.connection().isConnected()) {
+                    chldr.connection().closeConnection();
+                }
             }
 
             @Override
             public void onError(AsyncEvent event) {
-                log.error("Error occurred for connection ID: {}: {}", streamPulse.id(), event.getThrowable().getLocalizedMessage());
-                streamPulse.connection().closeConnection();
+                log.error("Error occurred for connection ID: {}: {}", chldr.id(), event.getThrowable().getLocalizedMessage());
+                actx.complete();
+                if (chldr.connection().isConnected()) {
+                    chldr.connection().closeConnection();
+                }
             }
 
             @Override
             public void onStartAsync(AsyncEvent event) {
-                log.debug("Async process started for connection ID: {}", streamPulse.id());
+                log.debug("Async process started for connection ID: {}", chldr.id());
             }
         });
     }
