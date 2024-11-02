@@ -7,8 +7,8 @@ MAIN_CLASS="com.palomiklo.streampulse.App"
 cd "$(dirname "$0")"
 
 echo "⚠️  Compiling the core module..."
-./mvnw clean compile 
-if [ $? -ne 0 ]; then
+./mvnw clean compile
+if [ $? -ne 0 ]; then 
     echo "Compilation failed. Exiting."
     exit 1
 fi
