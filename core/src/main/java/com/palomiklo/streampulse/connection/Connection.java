@@ -18,7 +18,6 @@ import com.palomiklo.streampulse.blueprint.IConnection;
 import com.palomiklo.streampulse.blueprint.IConnectionConfig;
 import static com.palomiklo.streampulse.context.AsynchronousContext.startAsyncContext;
 import static com.palomiklo.streampulse.header.Header.setHeaders;
-import com.palomiklo.streampulse.listener.Listener;
 import static com.palomiklo.streampulse.thread.CustomThreadFactory.streamPulseThreadFactory;
 import static com.palomiklo.streampulse.util.Wrap.wrap;
 
@@ -35,18 +34,15 @@ public class Connection implements IConnection {
     private final ScheduledExecutorService exec = newSingleThreadScheduledExecutor(streamPulseThreadFactory);
     private PrintWriter writer;
     private ScheduledFuture<?> stopHeartbeatTask;
-    private static ConnectionInfo ci;
 
-    public static ConnectionInfo createConnection(HttpServletRequest req, HttpServletResponse res) {
-        ci = new ConnectionInfo(randomUUID(), new Connection(res), startAsyncContext(req, res));
-        Listener.addListeners(ci.ctx().actx(), ci);
-        return ci;
+    public static ConnectionHolder createConnection(HttpServletRequest req, HttpServletResponse res) {
+        ConnectionHolder chldr = ConnectionHolder.create(randomUUID(), new Connection(res), startAsyncContext(req, res));
+        return chldr;
     }
 
-    public static ConnectionInfo createConnection(IConnectionConfig conf, HttpServletRequest req, HttpServletResponse res) {
-        ci = new ConnectionInfo(randomUUID(), new Connection(conf, res), startAsyncContext(req, res));
-        Listener.addListeners(ci.ctx().actx(), ci);
-        return ci;
+    public static ConnectionHolder createConnection(IConnectionConfig conf, HttpServletRequest req, HttpServletResponse res) {
+        ConnectionHolder chldr = ConnectionHolder.create(randomUUID(), new Connection(conf, res), startAsyncContext(req, res));
+        return chldr;
     }
 
     private Connection(IConnectionConfig conf, HttpServletResponse res) {
@@ -70,6 +66,23 @@ public class Connection implements IConnection {
         startHeartbeat();
     }
 
+    private void startHeartbeat() {
+        log.debug("Starting heartbeat...");
+
+        exec.scheduleAtFixedRate(
+                () -> wrap(() -> hearthbeat(), "Error during heartbeat: "),
+                conf.getInitialDelay(), conf.getPingInterval(), SECONDS
+        );
+
+        stopHeartbeatTask = exec.schedule(() -> log.debug("{} minutes has passed. Stopping heartbeat...", conf.getConnectionTimeout() / 60), conf.getConnectionTimeout(), SECONDS);
+    }
+
+    private void hearthbeat() {
+        if (isConnected()) {
+            sendEvent("ping");
+        }
+    }
+
     @Override
     public void sendEvent(String event) {
         writeLock.lock();
@@ -90,34 +103,22 @@ public class Connection implements IConnection {
         }
     }
 
-    private void startHeartbeat() {
-        log.debug("Starting heartbeat...");
-
-        exec.scheduleAtFixedRate(
-                () -> wrap(() -> hearthbeat(), "Error during heartbeat: "),
-                conf.getInitialDelay(), conf.getPingInterval(), SECONDS
-        );
-
-        stopHeartbeatTask = exec.schedule(() -> stopHearthbeat(), conf.getConnectionTimeout(), SECONDS);
-    }
-
-    private void hearthbeat() {
-        if (isConnected()) {
-            sendEvent("ping");
-        }
-    }
-
-    private void stopHearthbeat() {
-        log.debug("{} minutes has passed. Stopping heartbeat...", conf.getConnectionTimeout() / 60);
-    }
-
     public void closeConnection() {
-        exec.shutdown();
-        writer.close();
-        stopHeartbeatTask.cancel(true);
-        ci.ctx().actx().complete();
-        connected.set(false);
-        log.debug("Connection closed!");
+        writeLock.lock();
+        try {
+            if (connected.compareAndSet(true, false)) {
+                if (stopHeartbeatTask != null) {
+                    stopHeartbeatTask.cancel(true);
+                }
+                exec.shutdownNow();
+                if (writer != null) {
+                    writer.close();
+                }
+                log.debug("Connection closed!");
+            }
+        } finally {
+            writeLock.unlock();
+        }
     }
 
     public boolean isConnected() {

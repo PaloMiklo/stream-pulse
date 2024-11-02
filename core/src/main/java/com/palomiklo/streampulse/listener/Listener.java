@@ -3,7 +3,7 @@ package com.palomiklo.streampulse.listener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.palomiklo.streampulse.connection.ConnectionInfo;
+import com.palomiklo.streampulse.connection.ConnectionHolder;
 
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.AsyncEvent;
@@ -13,7 +13,7 @@ public class Listener {
 
     private static final Logger log = LoggerFactory.getLogger(Listener.class);
 
-    public static void addListeners(AsyncContext actx, ConnectionInfo streamPulse) {
+    public static void addListeners(AsyncContext actx, ConnectionHolder streamPulse) {
         actx.addListener(new AsyncListener() {
             @Override
             public void onComplete(AsyncEvent event) {
