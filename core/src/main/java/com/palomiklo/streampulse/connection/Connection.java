@@ -79,7 +79,7 @@ public class Connection implements IConnection {
 
     private void hearthbeat() {
         if (isConnected()) {
-            sendEvent("ping");
+            sendEvent(conf.getPing());
         }
     }
 
