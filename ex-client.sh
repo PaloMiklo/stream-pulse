@@ -6,5 +6,11 @@ else
   exit 1
 fi
 
+if [ -f ./scripts.env ]; then source ./scripts.env
+else
+  echo "⚠️  Error: scripts.env file not found. Exiting..."
+  exit 1
+fi
+
 echo "⚠️  Running client..."
-cd "$CLIENT_PATH" && yarn start; exec bash
+cd "$CLIENT_PATH" && CLIENT_EXE; exec bash

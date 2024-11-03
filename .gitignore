@@ -1,3 +1,4 @@
 .vscode
 **/target
 paths.env
+scripts.env
