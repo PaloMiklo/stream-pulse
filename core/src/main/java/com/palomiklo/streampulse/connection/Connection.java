@@ -2,6 +2,7 @@ package com.palomiklo.streampulse.connection;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.UUID;
 import static java.util.UUID.randomUUID;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import java.util.concurrent.ScheduledExecutorService;
@@ -34,52 +35,59 @@ public class Connection implements IConnection {
     private final ScheduledExecutorService exec = newSingleThreadScheduledExecutor(streamPulseThreadFactory);
     private PrintWriter writer;
     private ScheduledFuture<?> stopHeartbeatTask;
+    public final UUID id;
 
     public static ConnectionHolder createConnection(HttpServletRequest req, HttpServletResponse res) {
-        ConnectionHolder chldr = ConnectionHolder.create(randomUUID(), new Connection(res), startAsyncContext(req, res));
+        ConnectionHolder chldr = ConnectionHolder.create(new Connection(res), startAsyncContext(req, res));
         return chldr;
     }
 
     public static ConnectionHolder createConnection(IConnectionConfig conf, HttpServletRequest req, HttpServletResponse res) {
-        ConnectionHolder chldr = ConnectionHolder.create(randomUUID(), new Connection(conf, res), startAsyncContext(req, res));
+        ConnectionHolder chldr = ConnectionHolder.create(new Connection(conf, res), startAsyncContext(req, res));
         return chldr;
     }
 
     private Connection(IConnectionConfig conf, HttpServletResponse res) {
+        this.id = randomUUID();
         this.conf = conf;
         this.res = res;
-        wrap(() -> initializeConnection(), "Failed to initialize connection: ");
+        wrap(() -> initializeConnection(), "Failed to initialize connection for ID: {}: " + id);
     }
 
     private Connection(HttpServletResponse res) {
+        this.id = randomUUID();
         this.conf = new DefaultConnectionConfig();
         this.res = res;
-        wrap(() -> initializeConnection(), "Failed to initialize connection: ");
+        wrap(() -> initializeConnection(), "Failed to initialize connection for ID: {}: " + id);
     }
 
     private void initializeConnection() throws IOException {
         setHeaders(res);
 
         this.writer = res.getWriter();
-        log.debug("Connection established!");
+        log.debug("Connection established for ID: {}!", id);
 
         startHeartbeat();
     }
 
     private void startHeartbeat() {
-        log.debug("Starting heartbeat...");
+        log.debug("Starting heartbeat for connection ID: {}...", id);
 
         exec.scheduleAtFixedRate(
-                () -> wrap(() -> hearthbeat(), "Error during heartbeat: "),
+                () -> wrap(() -> hearthbeat(), "Error during heartbeat for connection ID: " + id),
                 conf.getInitialDelay(), conf.getPingInterval(), SECONDS
         );
 
-        stopHeartbeatTask = exec.schedule(() -> log.debug("{} minutes has passed. Stopping heartbeat...", conf.getConnectionTimeout() / 60), conf.getConnectionTimeout(), SECONDS);
+        stopHeartbeatTask = exec.schedule(() -> {
+            log.debug("{} minutes has passed. Stopping heartbeat for connection ID: {}...", conf.getConnectionTimeout() / 60, id);
+            closeConnection();
+        }, conf.getConnectionTimeout(), SECONDS);
+
     }
 
     private void hearthbeat() {
         if (isConnected()) {
-            sendEvent(conf.getPing());
+            sendEvent(String.format("Connection ID %s; event data: %s", id, conf.getPing().get()));
         }
     }
 
@@ -90,13 +98,13 @@ public class Connection implements IConnection {
             if (isConnected() && writer != null) {
                 writer.write("data: " + event + "\n\n");
                 writer.flush();
-                log.debug("Event sent: {}", event);
+                log.debug("CID: {} -> EVENT: {}", id, event);
 
                 if (writer.checkError()) {
-                    log.debug("Writer detected a connection error!");
+                    log.debug("Writer detected a connection error for ID: {}!", id);
                 }
             } else {
-                log.error("Connectin error occured!");
+                log.error("Error occured for connection ID: {}!", id);
             }
         } finally {
             writeLock.unlock();
@@ -115,7 +123,7 @@ public class Connection implements IConnection {
                 if (writer != null) {
                     writer.close();
                 }
-                log.debug("Connection closed!");
+                log.debug("Connection with ID: {} closed!", id);
             }
         } finally {
             writeLock.unlock();

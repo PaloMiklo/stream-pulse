@@ -1,5 +1,7 @@
 package com.palomiklo.streampulse.connection;
 
+import java.util.function.Supplier;
+
 import com.palomiklo.streampulse.blueprint.IConnectionConfig;
 import static com.palomiklo.streampulse.constant.Default.CONNECTION_CLEAN_UP_TIMEOUT;
 import static com.palomiklo.streampulse.constant.Default.CONNECTION_TIMEOUT;
@@ -30,7 +32,7 @@ public class DefaultConnectionConfig implements IConnectionConfig {
     }
 
     @Override
-    public String getPing() {
+    public Supplier<String> getPing() {
         return PING;
     }
 }

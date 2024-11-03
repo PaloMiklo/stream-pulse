@@ -1,5 +1,7 @@
 package com.palomiklo.streampulse.connection;
 
+import java.util.function.Supplier;
+
 import com.palomiklo.streampulse.blueprint.IConnectionConfig;
 import static com.palomiklo.streampulse.constant.Default.CONNECTION_CLEAN_UP_TIMEOUT;
 import static com.palomiklo.streampulse.constant.Default.CONNECTION_TIMEOUT;
@@ -13,7 +15,7 @@ public class CustomConnectionConfig implements IConnectionConfig {
     private final byte initialDelay;
     private final byte pingInterval;
     private final short connectionCleanUpTimeout;
-    private final String ping;
+    private final Supplier<String> ping;
 
     private CustomConnectionConfig(Builder builder) {
         this.connectionTimeout = builder.connectionTimeout;
@@ -48,7 +50,7 @@ public class CustomConnectionConfig implements IConnectionConfig {
     }
 
     @Override
-    public String getPing() {
+    public Supplier<String> getPing() {
         return ping;
     }
 
@@ -58,7 +60,7 @@ public class CustomConnectionConfig implements IConnectionConfig {
         private byte initialDelay = INITIAL_DELAY;
         private byte pingInterval = PING_INTERVAL;
         private short connectionCleanUpTimeout = CONNECTION_CLEAN_UP_TIMEOUT;
-        private String ping = PING;
+        private Supplier<String> ping = PING;
 
         public Builder connectionTimeout(byte connectionTimeout) {
             this.connectionTimeout = connectionTimeout;
@@ -80,7 +82,7 @@ public class CustomConnectionConfig implements IConnectionConfig {
             return this;
         }
 
-        public Builder ping(String ping) {
+        public Builder ping(Supplier<String> ping) {
             this.ping = ping;
             return this;
         }

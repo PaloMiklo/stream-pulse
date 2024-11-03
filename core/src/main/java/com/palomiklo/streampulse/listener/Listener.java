@@ -17,7 +17,7 @@ public class Listener {
         actx.addListener(new AsyncListener() {
             @Override
             public void onComplete(AsyncEvent event) {
-                log.debug("Async process completed for connection ID: {}", chldr.id());
+                log.debug("Async process completed for connection ID: {}", chldr.connection().id);
                 if (chldr.connection().isConnected()) {
                     chldr.connection().closeConnection();
                 }
@@ -25,7 +25,7 @@ public class Listener {
 
             @Override
             public void onTimeout(AsyncEvent event) {
-                log.debug("Async process timed out for connection ID: {}", chldr.id());
+                log.debug("Async process timed out for connection ID: {}", chldr.connection().id);
                 if (chldr.connection().isConnected()) {
                     chldr.connection().closeConnection();
                 }
@@ -33,7 +33,7 @@ public class Listener {
 
             @Override
             public void onError(AsyncEvent event) {
-                log.error("Error occurred for connection ID: {}: {}", chldr.id(), event.getThrowable().getLocalizedMessage());
+                log.error("Error occurred for connection ID: {}: {}", chldr.connection().id, event.getThrowable().getLocalizedMessage());
                 actx.complete();
                 if (chldr.connection().isConnected()) {
                     chldr.connection().closeConnection();
@@ -42,7 +42,7 @@ public class Listener {
 
             @Override
             public void onStartAsync(AsyncEvent event) {
-                log.debug("Async process started for connection ID: {}", chldr.id());
+                log.debug("Async process started for connection ID: {}", chldr.connection().id);
             }
         });
     }

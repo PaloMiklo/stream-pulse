@@ -1,5 +1,7 @@
 package com.palomiklo.streampulse.blueprint;
 
+import java.util.function.Supplier;
+
 public interface IConnectionConfig {
 
     byte getConnectionTimeout();
@@ -10,5 +12,5 @@ public interface IConnectionConfig {
 
     short getConnectionCleanUpTimeout();
 
-    String getPing();
+    Supplier<String> getPing();
 }
