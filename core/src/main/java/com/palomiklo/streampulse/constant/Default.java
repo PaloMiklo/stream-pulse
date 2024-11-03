@@ -9,4 +9,5 @@ public interface Default {
     byte PING_INTERVAL = 5;
     short CONNECTION_CLEAN_UP_TIMEOUT = 5 * 60;
     Supplier<String> PING = () -> "ping";
+    Supplier<String> RECONNECT_EVENT = () -> "reconnect";
 }

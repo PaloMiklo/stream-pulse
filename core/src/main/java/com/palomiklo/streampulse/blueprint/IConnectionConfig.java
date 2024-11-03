@@ -13,4 +13,6 @@ public interface IConnectionConfig {
     short getConnectionCleanUpTimeout();
 
     Supplier<String> getPing();
+
+    Supplier<String> getReconnectEvent();
 }

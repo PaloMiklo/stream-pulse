@@ -2,6 +2,7 @@ package com.palomiklo.streampulse.connection;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import static java.lang.String.format;
 import java.util.UUID;
 import static java.util.UUID.randomUUID;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
@@ -15,6 +16,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.palomiklo.streampulse.blueprint.Event;
+import static com.palomiklo.streampulse.blueprint.Event.serialize;
 import com.palomiklo.streampulse.blueprint.IConnection;
 import com.palomiklo.streampulse.blueprint.IConnectionConfig;
 import static com.palomiklo.streampulse.context.AsynchronousContext.startAsyncContext;
@@ -80,6 +83,7 @@ public class Connection implements IConnection {
 
         stopHeartbeatTask = exec.schedule(() -> {
             log.debug("{} minutes has passed. Stopping heartbeat for connection ID: {}...", conf.getConnectionTimeout() / 60, id);
+            sendEvent(serialize(new Event(id, conf.getReconnectEvent().get())));
             closeConnection();
         }, conf.getConnectionTimeout(), SECONDS);
 
@@ -87,7 +91,8 @@ public class Connection implements IConnection {
 
     private void hearthbeat() {
         if (isConnected()) {
-            sendEvent(String.format("Connection ID %s; event data: %s", id, conf.getPing().get()));
+            String event = serialize(new Event(id, conf.getPing().get()));
+            sendEvent(format(event));
         }
     }
 
@@ -96,12 +101,12 @@ public class Connection implements IConnection {
         writeLock.lock();
         try {
             if (isConnected() && writer != null) {
-                writer.write("data: " + event + "\n\n");
+                writer.write(event);
                 writer.flush();
-                log.debug("CID: {} -> EVENT: {}", id, event);
+                log.debug("EVENT: {}", event);
 
                 if (writer.checkError()) {
-                    log.debug("Writer detected a connection error for ID: {}!", id);
+                    log.debug("Writer detected a connection error for event: {}!", event);
                 }
             } else {
                 log.error("Error occured for connection ID: {}!", id);
