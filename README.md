@@ -78,9 +78,9 @@ connection.sendEvent("Welcome to StreamPulse!");
   - `CLIENT_PATH`: Path to the client application.
 
 - **`scripts.env`**: Contains reusable functions for managing common tasks:
-  - `CLIENT_EXE()`: Starts the client application.
-  - `DB_EXE()`: Brings up the database.
-  - `DB_VALIDATION()`: Checks if the database is running.     
+  - `CLIENT_EXE`: Starts the client application.
+  - `DB_EXE`: Brings up the database.
+  - `DB_VALIDATION`: Checks if the database is running.     
 
 These files are not part of the core library but are used in scripts to streamline project setup and execution.     
 ## IDE setup
