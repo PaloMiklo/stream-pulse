@@ -13,12 +13,6 @@ StreamPulse is a multi-module configurable Java-based library that enables real-
 # Getting Started
 Add StreamPulse to your project, configure your connection settings, and let it handle the rest. StreamPulse is built to work smoothly with Java-based web servers like Tomcat and others that support HTTP streaming.
 
-## Example Usage
-java
-```java
-ConnectionHolder connection = StreamPulse.builder().build();
-connection.sendEvent("Welcome to StreamPulse!");
-```
 # Requirements
 - Java 11+   
 - Compatible with Java-based web servers (Tomcat, Jetty, etc.)   
@@ -67,6 +61,12 @@ streampulse:
   username: postgres
   password: postgres
   driver-class-name: org.postgresql.Driver
+```
+## Example Usage
+java
+```java
+ConnectionHolder connection = StreamPulse.builder().build();
+connection.sendEvent("Welcome to StreamPulse!");
 ```
 
 # DEVELOPER
