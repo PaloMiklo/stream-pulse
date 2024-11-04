@@ -1,6 +1,40 @@
 # StreamPulse
 
-# 👷
+
+
+# Integration
+The project is hosted at `https://jitpack.io/#PaloMiklo/stream-pulse`       
+### Maven    
+```xml
+	<repositories>
+		<repository>
+		    <id>jitpack.io</id>
+		    <url>https://jitpack.io</url>
+		</repository>
+	</repositories>
+
+  	<dependency>
+	    <groupId>com.github.PaloMiklo</groupId>
+	    <artifactId>stream-pulse</artifactId>
+	    <version>1.0.0</version>
+	</dependency>
+```    
+### Gradle
+```java
+	dependencyResolutionManagement {
+		repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+		repositories {
+			mavenCentral()
+			maven { url 'https://jitpack.io' }
+		}
+	}
+```
+
+```java
+	dependencies {
+	        implementation 'com.github.PaloMiklo:stream-pulse:1.0.0'
+	}
+```
 
 # Configure Database Connection
 
@@ -13,6 +47,3 @@ streampulse:
   password: postgres
   driver-class-name: org.postgresql.Driver
 ```
-
-# Scripts
-[Link Text](SCRIPTS.md)
