@@ -3,7 +3,7 @@
 StreamPulse is a multi-module configurable Java-based library that enables real-time updates for your application with ease. Designed for modularity, it provides a core module that delivers essential functionality for managing long-lived server-client connections, ideal for applications needing live updates, notifications, or continuous data streams. This lightweight, framework-agnostic library simplifies the setup and management of these connections, allowing for easy integration with any Java-based application.
 
 # Key Features
-- **Seamless Connections**: Easily initialize and manage SSE connections for real-time data streaming.
+- **Seamless Connections**: Easily initialize and manage long-lived connections for real-time data streaming.
 - **Heartbeat Mechanism**: Ensures stable connections with configurable heartbeats, automatically managing reconnections when needed.
 - **Flexible Configuration**: Customize ping intervals, connection timeouts, and more for optimal performance.
 - **Error Handling & Reconnect Logic**: Includes built-in mechanisms to handle connection errors and automated reconnections.
