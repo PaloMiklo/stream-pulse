@@ -1,7 +1,7 @@
 #!/bin/bash
 
 MODULE="core"
-VERSION="1.0-SNAPSHOT"
+VERSION="1.1.0"
 MAIN_CLASS="com.palomiklo.streampulse.App"
 
 cd "$(dirname "$0")"
