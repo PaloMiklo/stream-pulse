@@ -1,4 +1,7 @@
 .vscode
-**/target
+**/build
 paths.env
 scripts.env
+.gradle
+gradle
+.idea

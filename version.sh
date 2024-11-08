@@ -7,7 +7,7 @@ fi
 
 NEW_VERSION=$1
 
-FILES=$(find . -type f \( -name "pom.xml" -o -name "pack.sh" -o -name "run.sh" \))
+FILES=$(find . -type f \( -name "pom.xml" -o -name "pack.sh" -o -name "run.sh" -o -name "build.gradle.kts" \))
 
 for FILE in $FILES; do
   if [[ $FILE == *.xml ]]; then
@@ -15,6 +15,9 @@ for FILE in $FILES; do
     echo "Updated version in $FILE"
   elif [[ $FILE == *.sh ]]; then
     sed -i "s|VERSION=\"[^\"]*\"|VERSION=\"$NEW_VERSION\"|g" "$FILE"
+    echo "Updated version in $FILE"
+  elif [[ $FILE == *build.gradle.kts ]]; then
+    sed -i "s|version = \".*\"|version = \"$NEW_VERSION\"|g" "$FILE"
     echo "Updated version in $FILE"
   fi
 done
