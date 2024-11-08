@@ -2,3 +2,6 @@
 **/target
 paths.env
 scripts.env
+.gradle
+.idea
+.mvn

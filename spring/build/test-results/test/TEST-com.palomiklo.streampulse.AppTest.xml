@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.palomiklo.streampulse.AppTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2024-11-08T22:39:24" hostname="PALKO-DESKTOP" time="0.001">
+  <properties/>
+  <testcase name="testApp" classname="com.palomiklo.streampulse.AppTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
