@@ -1,7 +1,7 @@
 #!/bin/bash
 
-echo "⚠️  Installing all modules into local repository..."
+echo "⚠️  Installing all modules into local Maven repository..."
 
-if [[ "$1" =~ ^(tests|test|t)$ ]]; then ./gradlew clean install -P local-install
-else ./gradlew clean install -DskipTests -P local-install
+if [[ "$1" =~ ^(tests|test|t)$ ]]; then ./gradlew clean publishToMavenLocal -P localInstall
+else ./gradlew clean publishToMavenLocal -DskipTests -P localInstall
 fi

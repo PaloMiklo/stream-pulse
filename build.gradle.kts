@@ -7,6 +7,7 @@ plugins {
     kotlin("jvm") version "1.9.24"
     java
     application
+    id("maven-publish")
 }
 
 java {
@@ -23,4 +24,15 @@ dependencies {
     implementation(libs.slf4j)
     implementation(libs.logback.classic)
     implementation(libs.logback.core)
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+            groupId = project.group.toString()
+            artifactId = project.name
+            version = project.version.toString()
+        }
+    }
 }
